@@ -1,0 +1,27 @@
+.button{
+    min-width: 4rem;
+    min-height: 4rem;
+    color: $button-textcolor;
+    border: 2px solid $bordercolor;
+    border-radius: 8rem;
+    outline: none;
+    font-size: 2rem;
+    font-weight: 900;
+    background-color: $button-color;
+    @include mq(768px) {
+        font-size: 1.5rem;
+        min-width: 6.5rem;
+        min-height: 6.5rem;
+    }
+
+    &:hover{
+        cursor: pointer;
+    }
+
+    &:hover,
+    &:focus {
+        box-shadow: 4px 2px 5px $text-shadow-color;
+        border-color: $font-color;
+    }
+}
+
