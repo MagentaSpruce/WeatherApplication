@@ -1,12 +1,17 @@
-export const addSpinner = (icon) => {
-    animateButton(icon);
-    setTimeout(animateButton, 1000, icon);
+export const setPlaceholderText = () => {
+    const input = document.getElementById('searchBar__text');
+    window.innerWidth < 415 ? (input.placeholder = "City, State, Country") : (input.placeholder = 'City, State, Country, or Zip Code')
 }
 
-const animateButton = icon => {
-    icon.classList.toggle('none');
-    icon.nextElementSibling.classList.toggle('block');
-    icon.nextElementSibling.classList.toggle('none');
+export const addSpinner = (element) => {
+    animateButton(element);
+    setTimeout(animateButton, 1000, element);
+}
+
+const animateButton = element => {
+    element.classList.toggle("none");
+    element.nextElementSibling.classList.toggle("block");
+    element.nextElementSibling.classList.toggle("none");
 }
 
 export const displayError = (headerMsg, srMsg) => {
@@ -14,11 +19,26 @@ export const displayError = (headerMsg, srMsg) => {
     updateScreenReaderConfirmation(srMsg);
 }
 
-const updateWeatherLocationHeader = message => {
-    const h2 = document.getElementById("currentForecast__location");
-    h2.textContent = message;
+export const displayApiError = statusCode => {
+    const properMsg = toProperCase(statusCode.message);
+    updateWeatherLocationHeader(properMsg);
+    updateScreenReaderConfirmation(`${properMsg}. Please try again.`);
+    console.log(error);
 }
 
-const updateScreenReaderConfirmation = message => {
-    document.getElementById('confirmation').textContent = message;
+const toProperCase = (text) => {
+    const words = text.split(" ");
+    const properWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+    return properWords.join(" ");
+}
+
+const updateWeatherLocationHeader = message => {
+    const h1 = document.getElementById("currentForecast__location");
+    h1.textContent = message;
+}
+
+export const updateScreenReaderConfirmation = message => {
+    document.getElementById("confirmation").textContent = message;
 }
