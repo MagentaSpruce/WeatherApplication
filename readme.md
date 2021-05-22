@@ -10,7 +10,9 @@ Constructing this project has helped me to better learn and practice the followi
 5) CSS animations
 6) DOMContentLoaded
 7) .nextElementSibling
+ 
 
+ done for night
 
 A general walkthrough of the unfactored JS code - strictly functionality only - can be found below. For a complete look at the refactored and finalized code please see the relevant file in the WeatherApplication directory.
 
