@@ -15,6 +15,20 @@ export const setLocationObject = (locationObj, coordsObj) => {
     return localStorage.getItem("defaultWeatherLocation");
   };
 
+  export const getWeatherFromCoords = async (locationObj) => {
+      const lat = locationObj.getLat();
+      const lon = locationObj.getLon();
+      const units = locationObj.getUnit();
+      const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=${units}&appid=${WEATHER_API_KEY}`;
+      try{
+          const weatherStream = await fetch(url);
+          const weatherJson = await weatherStream.json();
+          return weatherJson;
+      } catch(err){
+          console.error(err)
+      }
+  }
+
   export const getCoordsFromApi = async (entryText, units) => {
         //Looks for entries that start and end with numbers which we assume are zip codes
      const regex = /^\d+$/g;

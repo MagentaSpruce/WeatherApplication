@@ -2,7 +2,8 @@ import {
     setLocationObject,
     getHomeLocation,
     getCoordsFromApi,
-    cleanText
+    cleanText,
+    getWeatherFromCoords
   } from "./dataFunctions.js";
   import {
     setPlaceholderText,
@@ -140,6 +141,7 @@ const submitNewLocation = async (event) => {
     const coordsData = await getCoordsFromApi(entryText, currentLoc.getUnit());
     if (coordsData) {
       if (coordsData.cod === 200) {
+          //work with api data
         const myCoordsObj = {
           lat: coordsData.coord.lat,
           lon: coordsData.coord.lon,
@@ -158,7 +160,8 @@ const submitNewLocation = async (event) => {
   };
 
 const updateDataAndDisplay = async (locationObj) => {
-    console.log(locationObj);
-    // const weatherJson = await getWeatherFromCoords(locationObj);
+    // console.log(locationObj);
+    const weatherJson = await getWeatherFromCoords(locationObj);
+    console.log(weatherJson);
     // if (weatherJson) updateDisplay(weatherJson, locationObj); 
 };
