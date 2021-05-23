@@ -430,4 +430,5 @@ The createCurrentConditionsDivs() function was created to display the current co
   };
 ```
 
-***End Walkthrough
+***End Walkthrough - This walkthrough is left incomplete and will be refactored, remade, and updated within 45 days.
+
