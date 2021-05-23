@@ -1,7 +1,5 @@
 const WEATHER_API_KEY = "f604fe7e9c832f51efa69c074078e6ee";
-
 export const setLocationObject = (locationObj, coordsObj) => {
-    //cordsObj = what we received from gelocation of browser // locationObj is what we created with our CurrentLocation class
     const { lat, lon, name, unit } = coordsObj;
     locationObj.setLat(lat);
     locationObj.setLon(lon);
@@ -10,31 +8,45 @@ export const setLocationObject = (locationObj, coordsObj) => {
       locationObj.setUnit(unit);
     }
   };
-
+  
   export const getHomeLocation = () => {
     return localStorage.getItem("defaultWeatherLocation");
   };
-
+  
   export const getWeatherFromCoords = async (locationObj) => {
-      const lat = locationObj.getLat();
-      const lon = locationObj.getLon();
-      const units = locationObj.getUnit();
-      const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=${units}&appid=${WEATHER_API_KEY}`;
-      try{
-          const weatherStream = await fetch(url);
-          const weatherJson = await weatherStream.json();
-          return weatherJson;
-      } catch(err){
-          console.error(err)
-      }
-  }
-
+    const lat = locationObj.getLat();
+    const lon = locationObj.getLon();
+    const units = locationObj.getUnit();
+    const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=${units}&appid=${WEATHER_API_KEY}`;
+    try {
+      const weatherStream = await fetch(url);
+      const weatherJson = await weatherStream.json();
+      return weatherJson;
+    } catch (err) {
+      console.error(err);
+    } 
+  
+    // const urlDataObj = {
+    //   lat: locationObj.getLat(),
+    //   lon: locationObj.getLon(),
+    //   units: locationObj.getUnit()
+    // };
+    // try {
+    //   const weatherStream = await fetch("./.netlify/functions/get_weather", {
+    //     method: "POST",
+    //     body: JSON.stringify(urlDataObj)
+    //   });
+    //   const weatherJson = await weatherStream.json();
+    //   return weatherJson;
+    // } catch (err) {
+    //   console.error(err);
+    // }
+  };
+  
   export const getCoordsFromApi = async (entryText, units) => {
-        //Looks for entries that start and end with numbers which we assume are zip codes
      const regex = /^\d+$/g;
     const flag = regex.test(entryText) ? "zip" : "q";
     const url = `https://api.openweathermap.org/data/2.5/weather?${flag}=${entryText}&units=${units}&appid=${WEATHER_API_KEY}`;
-     //spaces turned into %20, lat/long changed, ect. Encodes URL.
     const encodedUrl = encodeURI(url);
     try {
       const dataStream = await fetch(encodedUrl);
@@ -42,12 +54,25 @@ export const setLocationObject = (locationObj, coordsObj) => {
       return jsonData;
     } catch (err) {
       console.error(err.stack);
-    }   
+    } 
+  
+    // const urlDataObj = {
+    //   text: entryText,
+    //   units: units
+    // };
+    // try {
+    //   const dataStream = await fetch("./.netlify/functions/get_coords", {
+    //     method: "POST",
+    //     body: JSON.stringify(urlDataObj)
+    //   });
+    //   const jsonData = await dataStream.json();
+    //   return jsonData;
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
-
-
-//eliminates spaces in the search field before, between, and after words (1 space b/t words)
-export const cleanText = (text) => {
+  
+  export const cleanText = (text) => {
     const regex = / {2,}/g;
     const entryText = text.replaceAll(regex, " ").trim();
     return entryText;
