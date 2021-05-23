@@ -16,6 +16,7 @@ Constructing this project has helped me to better learn and practice the followi
 11) encodedURL
 12) Working with dates
 13) Serverless functions
+14) Netlify
 
 A general walkthrough of the unfactored JS code - strictly functionality only - can be found below. For a complete look at the refactored and finalized code please see the relevant file in the WeatherApplication directory.
 
