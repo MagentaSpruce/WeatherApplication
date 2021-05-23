@@ -1,0 +1,23 @@
+{
+  "name": "weatherapp2",
+  "version": "1.0.0",
+  "description": "This weather application is built using HTML, SASS and JS with the Open Weather Map API(https://openweathermap.org/) and a mobile first design. It uses serverless functions in order to keep hidden API keys. This project can easily be cross utilized to meet a variety of project needs/purposes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MagentaSpruce/WeatherApplication.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MagentaSpruce/WeatherApplication/issues"
+  },
+  "homepage": "https://github.com/MagentaSpruce/WeatherApplication#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
+}
