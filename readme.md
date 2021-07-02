@@ -4,23 +4,26 @@ This weather application is built using HTML, SASS and JS with the Open Weather 
 
 Constructing this project has helped me to better learn and practice the following:
 1) Using fa-spin class on font-awesome icons
-2) @mixin _ {}
-3) flex-grow
-4) background-blend-mode: overlay
-5) CSS animations
-6) DOMContentLoaded
-7) .nextElementSibling
-8) Working with Local Storage
-9) Google Dev Tools --> More Tools --> Sensors (for testing geolocations)
-10) Using function expressions
-11) encodedURL
-12) Working with dates
-13) Serverless functions
-14) Netlify
+2) Accessibility and screen reading attribute helpers like role, aria-labels, and title attributes.
+3) @mixin _ {}
+4) flex-grow
+5) background-blend-mode: overlay
+6) CSS animations
+7) DOMContentLoaded
+8) .nextElementSibling
+9) Working with Local Storage
+10) Google Dev Tools --> More Tools --> Sensors (for testing geolocations)
+11) Using function expressions
+12) encodedURL
+13) Working with dates
+14) Serverless functions
+15) Netlify
 
 A general walkthrough of the unfactored JS code - strictly functionality only - can be found below. For a complete look at the refactored and finalized code please see the relevant file in the WeatherApplication directory.
 
-First the initapp() function is constructed which will complete the initial app loading operations. Next the CurrentLocation class is created with many useful methods that acquire a users current location. 
+After the HTML & SCSS/CSS have been finished and made working then the content which was used inside the display for styling is commented out so that it can be rerendered inside of the sections dynamically eventually. 
+
+First the initapp() function is constructed which will complete the initial app loading operations. Next the CurrentLocation class is created in the CurrentLocation.js file and then exported to main.js. The current location class contains all of the setters and getters for the constructor properties.
 ```JavaScript
 const initApp = () => {
     // add listeners
@@ -80,8 +83,28 @@ export default class CurrentLocation {
 document.addEventListener('DOMContentLoaded', initApp);
 ```
 
-
-Animations are added to the button icons by way of the addSpinner() and animateButton() functions.
+Next event listeners need to be added to the 6 buttons contained inside the app, starting with the geoButton. 
+```JavaScript
+const initApp() => {
+    const geoButton = document.getElementById("getLocation");
+    geoButton.addEventListener('click', getGeoWeather);
+    }
+ ```
+ 
+ Creating the getGeoWeather() function comes next. I will not read the code out throughout as this readme is not meant to be a JS tutorial. However were I to explain each function, which there are too many and this would go much too long, I would detail it out as thus:
+ If there is an event and that event type is a click then the icon that has the map marker on it will have the addSpinner() function called on it (not yet created) which will cause the loading spinner icon to animate during data retreival. If the broswer supported geolocation is not present or enabled then the geoError() function is returned to the client (not yet created). However if the user does have browser geolocation present/enabled then the getCurrentPosition() function (not yet created) is called to render the users location, or, barring some error, that error returned instead. 
+ ```JavaScript
+   const getGeoWeather = (event) => {
+    if (event && event.type === "click") {
+      const mapIcon = document.querySelector(".fa-map-marker-alt");
+      addSpinner(mapIcon);
+    }
+    if (!navigator.geolocation) return geoError();
+    navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+  };
+ ```
+ 
+ In the domFunctions.js the addSpinner() function is created and imported into main.js. Animations are added to the button icons by way of the animateButton() function.
 ```JavaScript
 export const addSpinner = (icon) => {
     animateButton(icon);
@@ -94,160 +117,156 @@ const animateButton = icon => {
     icon.nextElementSibling.classList.toggle('none');
 }
 ```
-const getGeoWeather = e => {
-    if (e) {
-        if(e.type === 'click'){
-            // add spinner
-            const mapIcon = document.querySelector('.fa-map-marker-alt');
-            addSpinner(mapIcon);
-        }
-    } 
-    
-    
-    To acquire the current location of the user, the getGeoWeather() function was created and gets called on its buttons click event.
-   ```JavaScript
-   const getGeoWeather = e => {
-    if (e) {
-        if(e.type === 'click'){
-            // add spinner
-            const mapIcon = document.querySelector('.fa-map-marker-alt');
-            addSpinner(mapIcon);
-        }
-    } 
-    if (!navigator.geolocation) geoError();
-    navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
-}
 
-    geoButton.addEventListener('click', getGeoWeather);
-   ```
-   
-   
-   Next the geoSuccess and geoError functions are created. geoError() is constructed first. displayError() is created along with two helper functions, updateWeatherLocationHeader() and updateScreenReaderConfirmation. These are all 3 utilized by the geoError() function.
-   ```JavaScript
-   const geoError = (errObj) => {
-    const errMsg = errObj ? errObj : "Geolocation not supported";
+
+Next the geoError() function were constructed.
+```JavaScript
+ const geoError = (errObj) => {
+    const errMsg = errObj ? errObj.message : "Geolocation not supported";
     displayError(errMsg, errMsg);
-    
-    
-    export const displayError = (headerMsg, srMsg) => {
+  };
+```
+
+Next the displayError() function was created inside of domFunctions.js to help the geoError() function. displayError() is imported into main.js.
+```JavaScript
+  export const displayError = (headerMsg, srMsg) => {
     updateWeatherLocationHeader(headerMsg);
     updateScreenReaderConfirmation(srMsg);
-}
+  };
+  ```
+  
+  Following this the two helper functions inside if displayError() were created.
+  ```JavaScript
+  const updateWeatherLocationHeader = message => {
+  document.getElementById('currentForecast__location');
+  h1.textContent = message;
+  };
+  
+  const updateScreenReaderConfirmation = message => {
+  document.getElementById('confirmation').textContent = message;
+  };
+  ```
 
-const updateWeatherLocationHeader = message => {
-    const h2 = document.getElementById("currentForecast__location");
-    h2.textContent = message;
-}
 
-const updateScreenReaderConfirmation = message => {
-    document.getElementById('confirmation').textContent = message;
-}
-}
-   ```
-   
-   
-   A similar process is repeated for the geoSuccess() function with the myCoordsObj being created within which determines the latitude and longitude of the current location. Then the setLocationObject()  function is constructed in order to retreive the user location data as an object. 
-   ```JavaScript
-   const geoSuccess = position => {
+The next function to be created is the geoSuccess function now that geoError has been taken care of(for now!).
+```JavaScript
+  const geoSuccess = (position) => {
     const myCoordsObj = {
-        lat: position.coords.latitude,
-        lon: position.coords.longitude,
-        name: `Lat:${position.coords.latitude} Long:${position.coords.longitude}`
+      lat: position.coords.latitude,
+      lon: position.coords.longitude,
+      name: `Lat:${position.coords.latitude} Long:${position.coords.longitude}`
     };
-    // set location object
-    setLocationObject(currentLocation, myCoordsObj);
- 
-    // update data and display
-      updateDataAndDisplay(currentLocation);
-}
-
-export const setLocationObject = (locationObj, coordsObj) => {
+    setLocationObject(currentLoc, myCoordsObj);
+    //update data and display
+  };
+  ```
+  
+  Before updating the data and display, the setLocationObject() function is created inside of dataFunctions.js and imported into main.js. This function takes the coordsObj which contains the data retrieved from the browser and the locationObj which was created above and uses the browser data to set the location object properties to match.
+ ```JavaScript
+ export const setLocationObject = (locationObj, coordsObj) => {
     const { lat, lon, name, unit } = coordsObj;
     locationObj.setLat(lat);
     locationObj.setLon(lon);
     locationObj.setName(name);
     if (unit) {
-        locationObj.setUnit(unit);
+      locationObj.setUnit(unit);
     }
-}
-   ```
-   
-   
-   To update the data and UI display with the user location the updateDataAndDisplay() function is created.
-   ```JavaScript
-   const updateDataAndDisplay = async locationObj => {
-     const weatherJson = await getWeatherFromCoords(locationObj);
-     if (weatherJson) updateDisplay(weatherJson, locationObj); 
-}
-   ```
-   
-   
-   To implement the home UI button first the element is selected and an add event listener added. Next the loadWeather() function is constructed which utilized the getHomeLocation() function. 
-   ```JavaScript
-    const homeButton = document.getElementById("home");
+  };
+  ```
+
+To finish the geoSuccess() function the update and display functionality is added and called
+```JavaScript
+const updateDateAndDisplay = async(locationObj) => {
+const weatherJson = await getWeatherFromCoords(locationObj);
+if(weatherJson) updateDisplay(weatherJson, locationObj);
+};
+```
+
+This takes care of the first navigation map icon button. Now a similar process is repeated for each button, starting with the home button icon being selected and listened to. 
+```JavaScript
+const initApp = () => {
+    // add listeners
+    const geoButton = document.getElementById('getLocation');
+    geoButton.addEventListener('click', getGeoWeather);
+    const homeButton = document.getElementById('home');
     homeButton.addEventListener('click', loadWeather);
-    
-const loadWeather = e => {
+    // set up
+
+    // load weather
+    loadWeather();
+}
+```
+
+At this point the loadWeather() function was created which first checks to see if there is already a saved location from which to render data for.
+```JavaScript
+const loadWeather = event => {
+    const savedLocation = getHomeLcation();
+  }
+ ```
+ 
+ Next the getHomeLocation() function was created inside of the dataFunctions.js file and imported into main.js.
+ ```JavaScript
+ export const getHomeLocation = () => {
+ return localStorage.getItem('defaultWeatherLocation');
+ };
+ ```
+
+At this point the loadWeather() function can be finished.
+```JavaScript
+  const loadWeather = (event) => {
     const savedLocation = getHomeLocation();
-    if(!savedLocation && !e) return getGeoWeather(); 
-    if(!savedLocation && e.type === 'click'){
-        displayError("No home location saved.",
-        "Sorry. Please save a home location first."
-        );
-    } else if (savedLocation && !e){
-        //When app is loaded w/saved loc & no btn click
-        displayHomeLocationWeather(savedLocation);
+    if (!savedLocation && !event) return getGeoWeather();
+    if (!savedLocation && event.type === "click") {
+      displayError(
+        "No Home Location Saved.",
+        "Sorry. Please save your home location first."
+      );
+    } else if (savedLocation && !event) {
+      displayHomeLocationWeather(savedLocation);
     } else {
-        //when button is clicked
-        const homeIcon = document.querySelector('.fa-home');
-        addSpinner(homeIcon);
-        displayHomeLocationWeather(savedLocation);
+      const homeIcon = document.querySelector(".fa-home");
+      addSpinner(homeIcon);
+      displayHomeLocationWeather(savedLocation);
     }
-}
-   ```
-   
-   
-   Following this, the displayHomeLocationWeather() function is assembled.
-   ```JavaScript
-   const displayHomeLocationWeather = home => {
-    if (typeof home === 'string'){
-        //parses string coming out of Local Stor
-        const locationJson = JSON.parse(home);
-        const myCoordsObj = {
-            lat: locationJson.lat,
-            lon: locationJson.lon,
-            name: locationJson.name,
-            unit: locationJson.unit
-        };
-        setLocationObject(currentLocation, myCoordsObj);
-        updateDataAndDisplay(currentLocation);
+  };
+  ```
+  
+  Next the helper function displayHomeLocationWeather() needs to be created. First the response is checked to make sure it is in the string format. This string is then parsed and the data contained within used to create the myCoordsObj. The values from this are then set as the values for the currentLocation object by way of using the currentLoc variable. The new data is then displayed to the screen.
+  ```JavaScript
+    const displayHomeLocationWeather = (home) => {
+    if (typeof home === "string") {
+      const locationJson = JSON.parse(home);
+      const myCoordsObj = {
+        lat: locationJson.lat,
+        lon: locationJson.lon,
+        name: locationJson.name,
+        unit: locationJson.unit
+      };
+      setLocationObject(currentLoc, myCoordsObj);
+      updateDataAndDisplay(currentLoc);
     }
-}
-   ```
-   
-   
-   The saveButton functionality is added next, first by selecting the element and adding a listener to it. Next, the saveLocation() function is created.
-   ```JavaScript
-       const saveButton = document.getElementById("saveLocation");
-    saveButton.addEventListener('click', saveLocation);
-    
-    const saveLocation = () => {
-    //if cur loc has lat & lon
-    if(currentLocation.getLat() && currentLocation.getLon()){
-        const saveIcon = document.querySelector('.fa-save');
-        addSpinner(saveIcon);
-        const location = {
-            name: currentLocation.getName(),
-            lat: currentLocation.getLat(),
-            lon: currentLocation.getLon(),
-            unit: currentLocation.getUnit()
-        };
-        localStorage.setItem('defaultWeatherLocation', JSON.stringify(location));
-        updateScreenReaderConfirmation(`Saved ${currentLocation.getName()} as home location.`);
-    }
-}
-   ```
-   
+  };
+  ```
+
+At this point the first two navigation buttons functionality has been implemented. Next the save button will be dealt with.
+```JavaScript
+const initApp = () => {
+  // add listeners
+  const geoButton = document.getElementById("getLocation");
+  geoButton.addEventListener("click", getGeoWeather);
+  const homeButton = document.getElementById("home");
+  homeButton.addEventListener("click", loadWeather);
+  const saveButton = document.getElementById("saveLocation");
+  saveButton.addEventListener("click", saveLocation);
+
+  // set up
+  setPlaceholderText();
+  // load weather
+  loadWeather();
+};
+```
+
+
    
    To add the functionality of the change units and refresh buttons, they are first selected and then their relevant functions created as for the previous buttons. 
    ```JavaScript
